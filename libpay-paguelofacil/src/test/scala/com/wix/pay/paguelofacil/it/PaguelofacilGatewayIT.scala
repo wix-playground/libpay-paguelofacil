@@ -65,7 +65,7 @@ class PaguelofacilGatewayIT extends SpecWithJUnit {
         merchantKey = merchantKey,
         creditCard = someCreditCard,
         currencyAmount = someCurrencyAmount
-      ) must beFailedTry.like {
+      ) must beAFailedTry.like {
         case e: PaymentErrorException => e.message must contain(someError)
       }
     }
