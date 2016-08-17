@@ -26,13 +26,13 @@ class PaguelofacilGateway(requestFactory: HttpRequestFactory,
 
   override def authorize(merchantKey: String, creditCard: CreditCard, currencyAmount: CurrencyAmount, customer: Option[Customer], deal: Option[Deal]): Try[String] = {
     Try {
-      throw new PaymentErrorException("PagueloFacil does not support two-step payments")
+      throw PaymentErrorException("PagueloFacil does not support two-step payments")
     }
   }
 
   override def capture(merchantKey: String, authorizationKey: String, amount: Double): Try[String] = {
     Try {
-      throw new PaymentErrorException("PagueloFacil does not support two-step payments")
+      throw PaymentErrorException("PagueloFacil does not support two-step payments")
     }
   }
 
@@ -58,22 +58,22 @@ class PaguelofacilGateway(requestFactory: HttpRequestFactory,
       response.error match {
         case None => response.Status.get match {
           case Statuses.approved => response.CODOPER.get
-          case Statuses.declined => throw new PaymentRejectedException(response.RespText.get)
+          case Statuses.declined => throw PaymentRejectedException(response.RespText.get)
         }
-        case Some(Errors.invalidCardNumberLength) => throw new PaymentRejectedException(Errors.invalidCardNumberLength)
-        case Some(errorMessage) => throw new PaymentErrorException(errorMessage)
+        case Some(Errors.invalidCardNumberLength) => throw PaymentRejectedException(Errors.invalidCardNumberLength)
+        case Some(errorMessage) => throw PaymentErrorException(errorMessage)
       }
 
     } match {
       case Success(codoper) => Success(codoper)
       case Failure(e: PaymentException) => Failure(e)
-      case Failure(e) => Failure(new PaymentErrorException(e.getMessage, e))
+      case Failure(e) => Failure(PaymentErrorException(e.getMessage, e))
     }
   }
 
   override def voidAuthorization(merchantKey: String, authorizationKey: String): Try[String] = {
     Try {
-      throw new PaymentErrorException("PagueloFacil does not support two-step payments")
+      throw PaymentErrorException("PagueloFacil does not support two-step payments")
     }
   }
 
