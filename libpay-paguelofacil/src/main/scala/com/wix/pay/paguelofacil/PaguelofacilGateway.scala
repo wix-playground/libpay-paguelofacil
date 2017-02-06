@@ -2,7 +2,7 @@ package com.wix.pay.paguelofacil
 
 import com.google.api.client.http._
 import com.wix.pay.creditcard.CreditCard
-import com.wix.pay.model.{CurrencyAmount, Customer, Deal}
+import com.wix.pay.model.{Customer, Deal, Payment}
 import com.wix.pay.paguelofacil.model.{Errors, Statuses}
 import com.wix.pay.{PaymentErrorException, PaymentException, PaymentGateway, PaymentRejectedException}
 
@@ -24,7 +24,7 @@ class PaguelofacilGateway(requestFactory: HttpRequestFactory,
                           authorizationParser: PaguelofacilAuthorizationParser = new JsonPaguelofacilAuthorizationParser) extends PaymentGateway {
   private val responseParser = new TransactionResponseParser
 
-  override def authorize(merchantKey: String, creditCard: CreditCard, currencyAmount: CurrencyAmount, customer: Option[Customer], deal: Option[Deal]): Try[String] = {
+  override def authorize(merchantKey: String, creditCard: CreditCard, payment: Payment, customer: Option[Customer], deal: Option[Deal]): Try[String] = {
     Try {
       throw PaymentErrorException("PagueloFacil does not support two-step payments")
     }
@@ -36,17 +36,18 @@ class PaguelofacilGateway(requestFactory: HttpRequestFactory,
     }
   }
 
-  override def sale(merchantKey: String, creditCard: CreditCard, currencyAmount: CurrencyAmount, customer: Option[Customer], deal: Option[Deal]): Try[String] = {
+  override def sale(merchantKey: String, creditCard: CreditCard, payment: Payment, customer: Option[Customer], deal: Option[Deal]): Try[String] = {
     Try {
       require(creditCard.csc.isDefined, "CSC is mandatory for PagueloFacil")
       require(creditCard.holderName.isDefined, "Holder Name is mandatory for PagueloFacil")
-      require(PaguelofacilGateway.supportedCurrencies.contains(currencyAmount.currency), s"PagueloFacil doesn't support ${currencyAmount.currency}")
+      require(PaguelofacilGateway.supportedCurrencies.contains(payment.currencyAmount.currency), s"PagueloFacil doesn't support ${payment.currencyAmount.currency}")
+      require(payment.installments == 1, "PagueloFacil does not support installments")
 
       val merchant = merchantParser.parse(merchantKey)
 
       val request = PaguelofacilHelper.createSaleRequest(
         cclw = merchant.cclw,
-        amount = currencyAmount.amount,
+        amount = payment.currencyAmount.amount,
         creditCard = creditCard,
         dealTitle = if (deal.isDefined) deal.get.title else None,
         customerEmail = if (customer.isDefined) customer.get.email else None,

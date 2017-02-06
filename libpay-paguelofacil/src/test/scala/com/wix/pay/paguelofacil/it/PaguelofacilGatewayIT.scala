@@ -2,7 +2,7 @@ package com.wix.pay.paguelofacil.it
 
 import com.google.api.client.http.javanet.NetHttpTransport
 import com.wix.pay.creditcard.{CreditCard, CreditCardOptionalFields, YearMonth}
-import com.wix.pay.model.CurrencyAmount
+import com.wix.pay.model.{CurrencyAmount, Payment}
 import com.wix.pay.paguelofacil._
 import com.wix.pay.paguelofacil.testkit.PaguelofacilDriver
 import com.wix.pay.{PaymentErrorException, PaymentGateway, PaymentRejectedException}
@@ -31,6 +31,7 @@ class PaguelofacilGatewayIT extends SpecWithJUnit {
     val merchantKey = merchantParser.stringify(someMerchant)
 
     val someCurrencyAmount = CurrencyAmount("PAB", 33.3)
+    val somePayment = Payment(someCurrencyAmount, 1)
     val someCreditCard = CreditCard(
       number = "4012888818888",
       expiration = YearMonth(2020, 12),
@@ -64,7 +65,7 @@ class PaguelofacilGatewayIT extends SpecWithJUnit {
       paguelofacil.sale(
         merchantKey = merchantKey,
         creditCard = someCreditCard,
-        currencyAmount = someCurrencyAmount
+        payment = somePayment
       ) must beAFailedTry.like {
         case e: PaymentErrorException => e.message must contain(someError)
       }
@@ -80,7 +81,7 @@ class PaguelofacilGatewayIT extends SpecWithJUnit {
       paguelofacil.sale(
         merchantKey = merchantKey,
         creditCard = someCreditCard,
-        currencyAmount = someCurrencyAmount
+        payment = somePayment
       ) must beASuccessfulTry(check = ===(someTransactionId))
     }
 
@@ -94,7 +95,7 @@ class PaguelofacilGatewayIT extends SpecWithJUnit {
       paguelofacil.sale(
         merchantKey = merchantKey,
         creditCard = someCreditCard,
-        currencyAmount = someCurrencyAmount
+        payment = somePayment
       ) must beAFailedTry(check = beAnInstanceOf[PaymentRejectedException])
     }
 
@@ -108,7 +109,7 @@ class PaguelofacilGatewayIT extends SpecWithJUnit {
       paguelofacil.sale(
         merchantKey = merchantKey,
         creditCard = someCreditCard,
-        currencyAmount = someCurrencyAmount
+        payment = somePayment
       ) must beAFailedTry(check = beAnInstanceOf[PaymentRejectedException])
     }
   }
