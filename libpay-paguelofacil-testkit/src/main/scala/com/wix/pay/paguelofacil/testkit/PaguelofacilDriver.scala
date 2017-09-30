@@ -12,8 +12,9 @@ import spray.http._
 import scala.collection.JavaConversions._
 import scala.collection.mutable
 
-class PaguelofacilDriver(port: Int) {
-  private val probe = new EmbeddedHttpProbe(port, EmbeddedHttpProbe.NotFoundHandler)
+class PaguelofacilDriver(probe: EmbeddedHttpProbe) {
+  def this(port: Int) = this(new EmbeddedHttpProbe(port, EmbeddedHttpProbe.NotFoundHandler))
+
   private val responseParser = new TransactionResponseParser
 
   def startProbe() {
