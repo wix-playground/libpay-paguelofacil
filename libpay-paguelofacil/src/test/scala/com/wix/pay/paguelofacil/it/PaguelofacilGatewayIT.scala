@@ -65,7 +65,7 @@ class PaguelofacilGatewayIT extends SpecWithJUnit {
       paguelofacil.sale(
         merchantKey = merchantKey,
         creditCard = someCreditCard,
-        payment = somePayment) must beAFailedTry(check = PaymentErrorException(someError))
+        payment = somePayment) must beAFailedTry(be_==(PaymentErrorException(someError)))
     }
 
     "successfully yield a transaction ID on valid request" in new Ctx {
