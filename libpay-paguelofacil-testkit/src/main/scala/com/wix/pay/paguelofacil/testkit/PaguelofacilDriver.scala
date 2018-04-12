@@ -15,8 +15,9 @@ import com.wix.pay.paguelofacil.model.{Errors, Statuses, TransactionResponse}
 import com.wix.pay.paguelofacil.{PaguelofacilHelper, TransactionResponseParser}
 
 
-class PaguelofacilDriver(port: Int) {
-  private val server: StubWebServer = aStubWebServer.onPort(port).build
+class PaguelofacilDriver(server: StubWebServer) {
+  def this(port: Int) = this(aStubWebServer.onPort(port).build)
+  
   private val responseParser = new TransactionResponseParser
 
   def start(): Unit = server.start()
