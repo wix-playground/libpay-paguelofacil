@@ -34,6 +34,10 @@ class PaguelofacilDriver(server: StubWebServer) {
     new RequestCtx(amount, params)
   }
 
+  def anySaleRequest: RequestCtx = new RequestCtx(amount = 0.0, params = Map.empty) {
+    override protected def isStubbedRequest(headers: Seq[HttpHeader], entity: HttpEntity) = true
+  }
+
   class RequestCtx(amount: Double, params: Map[String, String]) {
     def returns(transactionId: String): Unit = {
       val response = TransactionResponse(
@@ -100,7 +104,7 @@ class PaguelofacilDriver(server: StubWebServer) {
       }
     }
 
-    private def isStubbedRequest(headers: Seq[HttpHeader], entity: HttpEntity): Boolean = {
+    protected def isStubbedRequest(headers: Seq[HttpHeader], entity: HttpEntity): Boolean = {
       isStubbedRequestHeaders(headers) && isStubbedRequestEntity(entity)
     }
 
